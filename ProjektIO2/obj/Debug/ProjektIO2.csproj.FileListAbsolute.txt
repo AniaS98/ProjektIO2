@@ -1,0 +1,14 @@
+H:\Inteligencja Obliczeniowa\ProjektIO2\ProjektIO2\bin\Debug\ProjektIO2.exe.config
+H:\Inteligencja Obliczeniowa\ProjektIO2\ProjektIO2\bin\Debug\ProjektIO2.exe
+H:\Inteligencja Obliczeniowa\ProjektIO2\ProjektIO2\bin\Debug\ProjektIO2.pdb
+H:\Inteligencja Obliczeniowa\ProjektIO2\ProjektIO2\obj\Debug\ProjektIO2.csprojAssemblyReference.cache
+H:\Inteligencja Obliczeniowa\ProjektIO2\ProjektIO2\obj\Debug\ProjektIO2.csproj.CoreCompileInputs.cache
+H:\Inteligencja Obliczeniowa\ProjektIO2\ProjektIO2\obj\Debug\ProjektIO2.exe
+H:\Inteligencja Obliczeniowa\ProjektIO2\ProjektIO2\obj\Debug\ProjektIO2.pdb
+D:\adm\Documents\STUDIA\V Semestr\Inteligencja Obliczeniowa\ProjektIO2\ProjektIO2\bin\Debug\ProjektIO2.exe.config
+D:\adm\Documents\STUDIA\V Semestr\Inteligencja Obliczeniowa\ProjektIO2\ProjektIO2\bin\Debug\ProjektIO2.exe
+D:\adm\Documents\STUDIA\V Semestr\Inteligencja Obliczeniowa\ProjektIO2\ProjektIO2\bin\Debug\ProjektIO2.pdb
+D:\adm\Documents\STUDIA\V Semestr\Inteligencja Obliczeniowa\ProjektIO2\ProjektIO2\obj\Debug\ProjektIO2.csprojAssemblyReference.cache
+D:\adm\Documents\STUDIA\V Semestr\Inteligencja Obliczeniowa\ProjektIO2\ProjektIO2\obj\Debug\ProjektIO2.csproj.CoreCompileInputs.cache
+D:\adm\Documents\STUDIA\V Semestr\Inteligencja Obliczeniowa\ProjektIO2\ProjektIO2\obj\Debug\ProjektIO2.exe
+D:\adm\Documents\STUDIA\V Semestr\Inteligencja Obliczeniowa\ProjektIO2\ProjektIO2\obj\Debug\ProjektIO2.pdb

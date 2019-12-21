@@ -106,25 +106,30 @@ namespace ProjektIO2
             Console.WriteLine("1.Algorytm genetyczny: Turniej");
             rodzaj = Console.ReadLine();
             Random rnd = new Random();
+            Osobnik result = new Osobnik();
+            string nazwa;
             switch (rodzaj)
             {
                 case "1":
                     {
-                        Turniej(data, rowsize, colsize,rnd);
+                        result=Turniej(data, rowsize, colsize,rnd);
+                        nazwa = "Turniej";
                         break;
                     }
                 case "2":
                     {
-                        Turniej(data, rowsize, colsize, rnd);
+                        result = Turniej(data, rowsize, colsize, rnd);
+                        nazwa = "Turniej";
                         break;
                     }
                 default:
                     {
-                        Turniej(data, rowsize, colsize, rnd);
+                        result = Turniej(data, rowsize, colsize, rnd);
+                        nazwa = "Turniej";
                         break;
                     }
             }
-            Zapis(data, 1);
+            Zapis(result, nazwa);
 
             Console.ReadKey();
         }
@@ -312,8 +317,11 @@ namespace ProjektIO2
             return dzieci;
         }
 
-        static void Zapis(int[,] data, int suma)
+        static void Zapis(Osobnik osobnik,string nazwa)
         {
+            int suma = osobnik.suma;
+            int[] data = new int[osobnik.Tab.Length];
+            data = osobnik.Tab;
             string odp;
             Console.WriteLine("Czy chcesz zapisać to ustawienie? Wybierz numer opcji:");
             Console.WriteLine("1. TAK");
@@ -323,26 +331,19 @@ namespace ProjektIO2
             {
                 case "1":
                     {
-                        Console.WriteLine("Podaj nazwę pliku:");
-                        string nazwa = Console.ReadLine();
                         nazwa += suma.ToString();
                         nazwa += ".csv";
                         StringBuilder sb = new StringBuilder();
-                        sb.Append("Zadanie,Czas wykonania,Termin,Czas Zakonczenia, Odchylenie\n");
-                        for (int i = 0; i < 200; i++)
+                        for (int i = 0; i < osobnik.Tab.Length; i++)
                         {
-                            for (int j = 0; j < 5; j++)
-                            {
-                                sb.Append(data[i, j]);
-                                sb.Append(",");
-                            }
+                            sb.Append(data[i]);
                             sb.Append("\n");
                         }
                         File.WriteAllText(nazwa, sb.ToString());
                         System.IO.File.WriteAllText(nazwa, sb.ToString());
 
-                        Console.WriteLine("Plik znajduje się w: ProjektIO\\bin\\Debug\\netcoreapp2.2");
-                        Console.WriteLine("Plik został zapisany, potwierdź zakończenie programu");
+                        Console.WriteLine("Plik został zapisany pod nazwą metody oraz wynikiem ustawienia i znajduje się w: ProjektIO\\bin\\Debug\\netcoreapp2.2");
+                        Console.WriteLine("Potwierdź zakończenie programu");
                         break;
                     }
                 case "2":
@@ -365,8 +366,10 @@ namespace ProjektIO2
             return min;
         }
 
-        static void Turniej(int[,] dane, int rowsize, int colsize, Random rnd)
+        static Osobnik Turniej(int[,] dane, int rowsize, int colsize, Random rnd)
         {
+            List<Osobnik> wyniki = new List<Osobnik>();
+            Osobnik result = new Osobnik();
             Random rdouble = new Random();
             Random rand = new Random();
             List<int> lista = new List<int>();
@@ -389,7 +392,7 @@ namespace ProjektIO2
             odp = Console.ReadLine();
             Int32.TryParse(odp, out nrozwiazan);
 
-            Console.WriteLine("Podaj prawdopodobieństwo mutacji (0,1):");
+            Console.WriteLine("Podaj prawdopodobieństwo mutacji (liczba zmiennoprzecinkowa od 0 do 1):");
             odp = Console.ReadLine();
             mutacje = Double.Parse(odp);
             Console.WriteLine("Podaj przedział (dwie liczby całkowite od 0 do {0}):",nrozwiazan);
@@ -451,11 +454,24 @@ namespace ProjektIO2
                     //Console.WriteLine("Dziecko " + j + ": " + osobnicy[j].suma);
                     //Console.WriteLine("Dziecko " + j + 1 + ": " + osobnicy[j + 1].suma);
                 }
-                Console.WriteLine("\nKolejne pokolenia");
+                Console.WriteLine("\nKolejne pokolenie");
                 for (int j = 0; j < nrozwiazan; j++)
+                {
                     Console.WriteLine(osobnicy[j].suma);
+                }
+                    
             }
-
+            for (int j = 0; j < nrozwiazan; j++)
+            {
+                wyniki.Add(osobnicy[j]);
+            }
+            result = FindMin(wyniki, nrozwiazan);
+            Console.WriteLine("Wynik końcowy: " + result.suma);
+            return result;
         }
+
+
+
+
     }
 }

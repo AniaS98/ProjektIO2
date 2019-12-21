@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
@@ -9,24 +10,42 @@ using System.Threading.Tasks;
 
 namespace ProjektIO2
 {
+    public class Osobnik//Klasa pomocnicza, dzięki której zapisywana jest kolejność zadań (Tab) oraz termin zakończenia ostatniego zadania (suma)
+    {
+        public int[] Tab = new int[1000];
+        public int suma;
+        public int[] Tab1 { get => Tab; set => Tab = value; }
+        public int Suma { get => suma; set => suma = value; }
+        public Osobnik()
+        {
+            suma = 0;
+        }
+        public Osobnik(int[] Tab, int suma)
+        {
+            this.Tab = Tab;
+            this.suma = suma;
+        }
+
+        public static IComparer SortBySum
+        { get { return (IComparer)new OsobnikSumComparer(); } }
+    }
+
+    public class OsobnikSumComparer : IComparer//Interfejs pozwalający na posortowanie tablicy (w rankingu liniowym)
+    {
+        int IComparer.Compare(Object o1, Object o2)
+        {
+            Osobnik os1 = o1 as Osobnik;
+            Osobnik os2 = o2 as Osobnik;
+            if (os1 != null && os2 != null)
+                return os2.suma.CompareTo(os1.suma);
+            else
+                throw new ArgumentException("Parametr nie jest osobnikiem!");
+        }
+    }
+
     class Program
     {
-        public class Osobnik//Klasa pomocnicza, dzięki której zapisywana jest kolejność zadań (Tab) oraz termin zakończenia ostatniego zadania (suma)
-        {
-            public int[] Tab =new int[1000];
-            public int suma;
-            public int[] Tab1 { get => Tab; set => Tab = value; }
-            public int Suma { get => suma; set => suma = value; }
-            public Osobnik()
-            {
-                suma = 0;
-            }
-            public Osobnik(int[] Tab, int suma)
-            {
-                this.Tab = Tab;
-                this.suma = suma;
-            }
-        }
+
 
         static void Main(string[] args)
         {
@@ -104,8 +123,11 @@ namespace ProjektIO2
             //Switch wybierający jaka metoda będzie wykonywana
             Console.WriteLine("Wybierz metodę podając numer opcji:");
             Console.WriteLine("1.Algorytm genetyczny: Turniej");
+            Console.WriteLine("2.Algorytm genetyczny: Ruletka");
+            Console.WriteLine("3.Algorytm genetyczny: Ranking Liniowy");
             rodzaj = Console.ReadLine();
             Random rnd = new Random();
+            Random rdouble = new Random();
             Osobnik result = new Osobnik();
             string nazwa;
             switch (rodzaj)
@@ -118,8 +140,14 @@ namespace ProjektIO2
                     }
                 case "2":
                     {
-                        result = Turniej(data, rowsize, colsize, rnd);
-                        nazwa = "Turniej";
+                        result = Ruletka(data, rowsize, colsize, rnd, rdouble);
+                        nazwa = "Ruletka";
+                        break;
+                    }
+                case "3":
+                    {
+                        result = RankingLiniowy(data, rowsize, colsize, rnd, rdouble);
+                        nazwa = "RankingLiniowy";
                         break;
                     }
                 default:
@@ -433,20 +461,7 @@ namespace ProjektIO2
                     pomocnicy[1] = FindMin(LosowiOsobnicy, glosowa-1);//Wybór drugiego najlepszego wyniku
                     //Console.WriteLine("Rodzic 1: " + pomocnicy[0].suma);
                     //Console.WriteLine("Rodzic 2: " + pomocnicy[1].suma);
-                    /*LosowiOsobnicy = new List<Osobnik>();
-                    //Console.WriteLine("     "+pomocnicy[0].suma);
-                    mieszalnik = new List<int>();
 
-                    for (int k = 0; k < glosowa; k++)
-                    {
-                        zamiana = rnd.Next(0, lista.Count);
-                        mieszalnik.Add(lista[zamiana]);
-                        lista.RemoveAt(zamiana);
-                        LosowiOsobnicy.Add(osobnicy[mieszalnik[k]]);
-                    }
-                    pomocnicy[1] = FindMin(LosowiOsobnicy, glosowa);
-                    //Console.WriteLine("     " + pomocnicy[1].suma);
-                    */
                     pomocnicy = Krzyzowanie(pomocnicy[0], pomocnicy[1], przedzial, rowsize, colsize, mutacje, dane, rdouble, rand);//Tworzenie dzieci z wybranych rodziców
                     osobnicy[j] = pomocnicy[0];
                     osobnicy[j + 1] = pomocnicy[1];
@@ -470,6 +485,234 @@ namespace ProjektIO2
             return result;
         }
 
+        static Osobnik Ruletka(int[,] dane, int rowsize, int colsize, Random rnd,Random rdouble)
+        {
+            Random rand = new Random();
+            List<Osobnik> wyniki = new List<Osobnik>();
+            List<Osobnik> LosowiOsobnicy = new List<Osobnik>();
+            Osobnik result = new Osobnik();
+            int powtorzenia = 2;
+            int nrozwiazan = 10;
+            double mutacje = 0.1;
+            string odp;
+            Osobnik[] pomocnicy = new Osobnik[2];
+            List<int> mieszalnik = new List<int>();
+            pomocnicy[0] = pomocnicy[1] = new Osobnik();
+            int glosowa = (int)(nrozwiazan * 0.3);//Ugrupowanie, z którego wybierany jest najlepszy wynik ma wielkość 30% liczby rozwiązań
+            int[] przedzial = new int[2];
+            przedzial[0] = 2;
+            przedzial[1] = 5;
+
+            
+            Console.WriteLine("Podaj liczbę pokoleń:");
+            odp = Console.ReadLine();
+            Int32.TryParse(odp, out powtorzenia);
+
+            Console.WriteLine("Podaj liczbę rozwiązań do analizy (musi być parzysta):");
+            odp = Console.ReadLine();
+            Int32.TryParse(odp, out nrozwiazan);
+
+            Console.WriteLine("Podaj prawdopodobieństwo mutacji (liczba zmiennoprzecinkowa od 0 do 1):");
+            odp = Console.ReadLine();
+            mutacje = Double.Parse(odp);
+            
+            Console.WriteLine("Podaj przedział (dwie liczby całkowite od 0 do {0}):", nrozwiazan);
+            odp = Console.ReadLine();
+            Int32.TryParse(odp, out przedzial[0]);
+            odp = Console.ReadLine();
+            Int32.TryParse(odp, out przedzial[1]);
+            Osobnik[] osobnicy = new Osobnik[nrozwiazan];
+            //Losowanie początkowych ustawień zadań dla n-rozwiązań
+            for (int j = 0; j < nrozwiazan; j++)
+            {
+                osobnicy[j] = Losowanie(dane, rowsize, colsize, rnd);
+                //Console.WriteLine(osobnicy[j].Tab[0] + " " + osobnicy[j].suma);
+            }
+            
+            double rozmiarWycinka = 100 / nrozwiazan;//wielkość pojedynczeko wycinka ruletki
+            double losowa = 0.0;
+            int znacznik;
+            int mnoznik;
+            List<int> lista = new List<int>();
+            lista = new List<int>();
+            
+            for (int i = 0; i < powtorzenia; i++)
+            {
+                for (int j = 0; j < nrozwiazan; j += 2)
+                {
+                    for (int k = 0; k < nrozwiazan; k++)
+                        lista.Add(k);
+                    LosowiOsobnicy = new List<Osobnik>();
+                    for (int k=0;k<glosowa;)//Losowanie chromosomów
+                    {
+                        losowa = rdouble.NextDouble() * 100;//Liczba losowa
+                        mnoznik = Convert.ToInt32(Math.Floor(losowa / rozmiarWycinka));//numer indeksu wycinka ruletki
+                        if (lista.Contains(mnoznik))//Dodawanie elementów ugrupowania do zbioru liczb poddawanych analizie
+                        {
+                            lista.Remove(mnoznik);
+                            LosowiOsobnicy.Add(osobnicy[mnoznik]);
+                            k++;
+                        }
+                    }
+                    pomocnicy[0] = FindMin(LosowiOsobnicy, glosowa);//Wybór pierwszego najlepszego wyniku
+                    LosowiOsobnicy.Remove(pomocnicy[0]);
+                    pomocnicy[1] = FindMin(LosowiOsobnicy, glosowa-1);//Wybór drugiego najlepszego wyniku
+                    //Console.WriteLine("Rodzic 1: " + pomocnicy[0].suma);
+                    //Console.WriteLine("Rodzic 2: " + pomocnicy[1].suma);
+
+
+                    pomocnicy = Krzyzowanie(pomocnicy[0], pomocnicy[1], przedzial, rowsize, colsize, mutacje, dane, rdouble, rand);//Tworzenie dzieci z wybranych rodziców
+                    osobnicy[j] = pomocnicy[0];
+                    osobnicy[j + 1] = pomocnicy[1];
+
+                    //Console.WriteLine("Dziecko " + j + ": " + osobnicy[j].suma);
+                    //Console.WriteLine("Dziecko " + j + 1 + ": " + osobnicy[j + 1].suma);
+
+                }
+                Console.WriteLine("\nKolejne pokolenie");
+                for (int j = 0; j < nrozwiazan; j++)
+                {
+                    Console.WriteLine(osobnicy[j].suma);
+                }
+
+
+
+            }
+            for (int j = 0; j < nrozwiazan; j++)
+            {
+                wyniki.Add(osobnicy[j]);
+            }
+            result = FindMin(wyniki, nrozwiazan);
+            Console.WriteLine("Wynik końcowy: " + result.suma);
+
+            return result;   
+        }
+
+        static Osobnik RankingLiniowy(int[,] dane, int rowsize, int colsize, Random rnd, Random rdouble)
+        {
+            Random rand = new Random();
+            List<Osobnik> wyniki = new List<Osobnik>();
+            List<Osobnik> LosowiOsobnicy = new List<Osobnik>();
+            Osobnik result = new Osobnik();
+            int powtorzenia = 2;
+            int nrozwiazan = 10;
+            double mutacje = 0.1;
+            string odp;
+            Osobnik[] pomocnicy = new Osobnik[2];
+            List<int> mieszalnik = new List<int>();
+            pomocnicy[0] = pomocnicy[1] = new Osobnik();
+            int glosowa = (int)(nrozwiazan * 0.3);//Ugrupowanie, z którego wybierany jest najlepszy wynik ma wielkość 30% liczby rozwiązań
+            int[] przedzial = new int[2];
+            przedzial[0] = 2;
+            przedzial[1] = 5;
+
+
+            Console.WriteLine("Podaj liczbę pokoleń:");
+            odp = Console.ReadLine();
+            Int32.TryParse(odp, out powtorzenia);
+
+            Console.WriteLine("Podaj liczbę rozwiązań do analizy (musi być parzysta):");
+            odp = Console.ReadLine();
+            Int32.TryParse(odp, out nrozwiazan);
+
+            Console.WriteLine("Podaj prawdopodobieństwo mutacji (liczba zmiennoprzecinkowa od 0 do 1):");
+            odp = Console.ReadLine();
+            mutacje = Double.Parse(odp);
+
+            Console.WriteLine("Podaj przedział (dwie liczby całkowite od 0 do {0}):", nrozwiazan);
+            odp = Console.ReadLine();
+            Int32.TryParse(odp, out przedzial[0]);
+            odp = Console.ReadLine();
+            Int32.TryParse(odp, out przedzial[1]);
+            Osobnik[] osobnicy = new Osobnik[nrozwiazan];
+            //Losowanie początkowych ustawień zadań dla n-rozwiązań
+            for (int j = 0; j < nrozwiazan; j++)
+            {
+                osobnicy[j] = Losowanie(dane, rowsize, colsize, rnd);
+                //Console.WriteLine(osobnicy[j].Tab[0] + " " + osobnicy[j].suma);
+            }
+
+            int rozmiarRuletki;//wielkość pojedynczeko wycinka ruletki
+            double losowa = 0.0;
+            int znacznik;
+            int mnoznik;
+            int g;
+            List<int> lista = new List<int>();
+            List<double> ruletkaList = new List<double>();
+            lista = new List<int>();
+
+            for (int i = 0; i < powtorzenia; i++)
+            {
+                for (int j = 0; j < nrozwiazan; j += 2)
+                {
+                    Array.Sort(osobnicy, Osobnik.SortBySum);//Sortowanie tablicy osobników
+                    rozmiarRuletki = 0;
+                    for (int k = 0; k < nrozwiazan; k++)
+                    {
+                        lista.Add(k);
+                        rozmiarRuletki += (k+1);
+                    }
+                    ruletkaList.Add(0.0);
+                    for (int k = 0; k < nrozwiazan; k++)//Nadawanie wielkości poszczególnym kawałkom ruletki
+                    {
+                        losowa = k+1.0;
+                        losowa /= rozmiarRuletki;
+                        losowa += ruletkaList[k];
+                        ruletkaList.Add(losowa);
+                    }
+
+                    LosowiOsobnicy = new List<Osobnik>();
+                    for (int k = 0; k < glosowa;)//Losowanie chromosomów
+                    {
+                        losowa = rdouble.NextDouble();//Liczba losowa
+                        g = 0;
+                        while(losowa>ruletkaList[g])
+                            g++;
+                        g--;
+                        if (lista.Contains(g))//Dodawanie elementów ugrupowania do zbioru liczb poddawanych analizie
+                        {
+                            lista.Remove(g);
+                            LosowiOsobnicy.Add(osobnicy[g]);
+                            Console.WriteLine("Osobnicy " + osobnicy[g].suma);
+                            k++;
+                        }
+                    }
+                    pomocnicy[0] = FindMin(LosowiOsobnicy, glosowa);//Wybór pierwszego najlepszego wyniku
+                    LosowiOsobnicy.Remove(pomocnicy[0]);
+                    pomocnicy[1] = FindMin(LosowiOsobnicy, glosowa - 1);//Wybór drugiego najlepszego wyniku
+                    //Console.WriteLine("Rodzic 1: " + pomocnicy[0].suma);
+                    //Console.WriteLine("Rodzic 2: " + pomocnicy[1].suma);
+
+
+                    pomocnicy = Krzyzowanie(pomocnicy[0], pomocnicy[1], przedzial, rowsize, colsize, mutacje, dane, rdouble, rand);//Tworzenie dzieci z wybranych rodziców
+                    osobnicy[j] = pomocnicy[0];
+                    osobnicy[j + 1] = pomocnicy[1];
+
+                    //Console.WriteLine("Dziecko " + j + ": " + osobnicy[j].suma);
+                    //Console.WriteLine("Dziecko " + j + 1 + ": " + osobnicy[j + 1].suma);
+
+                }
+                Console.WriteLine("\nKolejne pokolenie");
+                for (int j = 0; j < nrozwiazan; j++)
+                {
+                    Console.WriteLine(osobnicy[j].suma);
+                }
+
+
+
+            }
+            for (int j = 0; j < nrozwiazan; j++)
+            {
+                wyniki.Add(osobnicy[j]);
+            }
+            result = FindMin(wyniki, nrozwiazan);
+            Console.WriteLine("Wynik końcowy: " + result.suma);
+
+
+
+
+            return result;
+        }
 
 
 

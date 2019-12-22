@@ -429,6 +429,7 @@ namespace ProjektIO2
             odp = Console.ReadLine();
             Int32.TryParse(odp, out przedzial[1]);
 
+            Osobnik[] osobnicyPomoc = new Osobnik[nrozwiazan];
             Osobnik[] osobnicy = new Osobnik[nrozwiazan];
             Osobnik[] dzieci = new Osobnik[nrozwiazan];
             Osobnik[] pomocnicy = new Osobnik[2];
@@ -463,12 +464,13 @@ namespace ProjektIO2
                     //Console.WriteLine("Rodzic 2: " + pomocnicy[1].suma);
 
                     pomocnicy = Krzyzowanie(pomocnicy[0], pomocnicy[1], przedzial, rowsize, colsize, mutacje, dane, rdouble, rand);//Tworzenie dzieci z wybranych rodziców
-                    osobnicy[j] = pomocnicy[0];
-                    osobnicy[j + 1] = pomocnicy[1];
-                    
-                    //Console.WriteLine("Dziecko " + j + ": " + osobnicy[j].suma);
-                    //Console.WriteLine("Dziecko " + j + 1 + ": " + osobnicy[j + 1].suma);
+                    osobnicyPomoc[j] = pomocnicy[0];
+                    osobnicyPomoc[j + 1] = pomocnicy[1];
+
+                    //Console.WriteLine("Dziecko " + j + ": "+ osobnicyPomoc[j].suma+" " + osobnicy[j].suma);
+                    //Console.WriteLine("Dziecko " + j + 1 + ": " + osobnicyPomoc[j+1].suma + " " + osobnicy[j + 1].suma);
                 }
+                osobnicy = osobnicyPomoc;
                 Console.WriteLine("\nKolejne pokolenie");
                 for (int j = 0; j < nrozwiazan; j++)
                 {
@@ -522,6 +524,7 @@ namespace ProjektIO2
             odp = Console.ReadLine();
             Int32.TryParse(odp, out przedzial[1]);
             Osobnik[] osobnicy = new Osobnik[nrozwiazan];
+            Osobnik[] osobnicyPomoc = new Osobnik[nrozwiazan];
             //Losowanie początkowych ustawień zadań dla n-rozwiązań
             for (int j = 0; j < nrozwiazan; j++)
             {
@@ -562,13 +565,15 @@ namespace ProjektIO2
 
 
                     pomocnicy = Krzyzowanie(pomocnicy[0], pomocnicy[1], przedzial, rowsize, colsize, mutacje, dane, rdouble, rand);//Tworzenie dzieci z wybranych rodziców
-                    osobnicy[j] = pomocnicy[0];
-                    osobnicy[j + 1] = pomocnicy[1];
+                    osobnicyPomoc[j] = pomocnicy[0];
+                    osobnicyPomoc[j + 1] = pomocnicy[1];
 
-                    //Console.WriteLine("Dziecko " + j + ": " + osobnicy[j].suma);
-                    //Console.WriteLine("Dziecko " + j + 1 + ": " + osobnicy[j + 1].suma);
+                    //Console.WriteLine("Dziecko " + j + ": "+ osobnicyPomoc[j].suma+" " + osobnicy[j].suma);
+                    //Console.WriteLine("Dziecko " + j + 1 + ": " + osobnicyPomoc[j+1].suma + " " + osobnicy[j + 1].suma);
 
                 }
+                osobnicy = osobnicyPomoc;
+
                 Console.WriteLine("\nKolejne pokolenie");
                 for (int j = 0; j < nrozwiazan; j++)
                 {
@@ -625,11 +630,12 @@ namespace ProjektIO2
             odp = Console.ReadLine();
             Int32.TryParse(odp, out przedzial[1]);
             Osobnik[] osobnicy = new Osobnik[nrozwiazan];
+            Osobnik[] osobnicyPomoc = new Osobnik[nrozwiazan];
             //Losowanie początkowych ustawień zadań dla n-rozwiązań
             for (int j = 0; j < nrozwiazan; j++)
             {
                 osobnicy[j] = Losowanie(dane, rowsize, colsize, rnd);
-                //Console.WriteLine(osobnicy[j].Tab[0] + " " + osobnicy[j].suma);
+                //Console.WriteLine(" " + osobnicy[j].suma);
             }
 
             int rozmiarRuletki;//wielkość pojedynczeko wycinka ruletki
@@ -673,10 +679,10 @@ namespace ProjektIO2
                         {
                             lista.Remove(g);
                             LosowiOsobnicy.Add(osobnicy[g]);
-                            Console.WriteLine("Osobnicy " + osobnicy[g].suma);
                             k++;
                         }
                     }
+                    
                     pomocnicy[0] = FindMin(LosowiOsobnicy, glosowa);//Wybór pierwszego najlepszego wyniku
                     LosowiOsobnicy.Remove(pomocnicy[0]);
                     pomocnicy[1] = FindMin(LosowiOsobnicy, glosowa - 1);//Wybór drugiego najlepszego wyniku
@@ -685,13 +691,14 @@ namespace ProjektIO2
 
 
                     pomocnicy = Krzyzowanie(pomocnicy[0], pomocnicy[1], przedzial, rowsize, colsize, mutacje, dane, rdouble, rand);//Tworzenie dzieci z wybranych rodziców
-                    osobnicy[j] = pomocnicy[0];
-                    osobnicy[j + 1] = pomocnicy[1];
+                    osobnicyPomoc[j] = pomocnicy[0];
+                    osobnicyPomoc[j + 1] = pomocnicy[1];
 
-                    //Console.WriteLine("Dziecko " + j + ": " + osobnicy[j].suma);
-                    //Console.WriteLine("Dziecko " + j + 1 + ": " + osobnicy[j + 1].suma);
+                    //Console.WriteLine("Dziecko " + j + ": "+ osobnicyPomoc[j].suma+" " + osobnicy[j].suma);
+                    //Console.WriteLine("Dziecko " + j + 1 + ": " + osobnicyPomoc[j+1].suma + " " + osobnicy[j + 1].suma);
 
                 }
+                osobnicy = osobnicyPomoc;
                 Console.WriteLine("\nKolejne pokolenie");
                 for (int j = 0; j < nrozwiazan; j++)
                 {

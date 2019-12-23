@@ -30,6 +30,36 @@ namespace ProjektIO2
         { get { return (IComparer)new OsobnikSumComparer(); } }
     }
 
+    public class Tabu
+    {
+        int a;
+        int b;
+        int licznik;
+        public int A { get => a; set => a = value; }
+        public int B { get => b; set => b = value; }
+        public int Licznik { get => licznik; set => licznik = value; }
+        public Tabu()
+        {
+            a = 0;
+            b = 0;
+            licznik = 0;
+        }
+        public Tabu(int a, int b, int licznik)
+        {
+            this.a = a;
+            this.b = b;
+            this.licznik = licznik;
+        }
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append(a.ToString());
+            sb.Append(b.ToString());
+            sb.Append(licznik.ToString());
+            return sb.ToString();
+        }
+    }
+    
     public class OsobnikSumComparer : IComparer//Interfejs pozwalający na posortowanie tablicy (w rankingu liniowym)
     {
         int IComparer.Compare(Object o1, Object o2)
@@ -45,8 +75,6 @@ namespace ProjektIO2
 
     class Program
     {
-
-
         static void Main(string[] args)
         {
             string plik;
@@ -78,6 +106,12 @@ namespace ProjektIO2
             int colsize = ds.Tables[0].Columns.Count;
             DataTable dataTab = new DataTable();
             int[,] data = new int[rowsize, colsize];
+            string odp;
+            int powtorzenia=10;
+            int nrozwiazan=10;
+            int[] przedzial = new int[2];
+            przedzial[0] = przedzial[1] = 0;
+            double mutacje=0.1;
             //int[,] dane = new int[rowsize, colsize];
             for (int i=0;i<rowsize; i++)
             {
@@ -87,45 +121,38 @@ namespace ProjektIO2
                 }
                 //Console.WriteLine(data[i, 0] + " " + data[i, 1] + " " + data[i, 2] + " " + data[i, 3] + " " + data[i, 4] + " " + data[i, 5] + " " + data[i, 6] + " " + data[i, 7]);
             }
-            //Liczenie podstawowoych wartości +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-            /*for (int i = 0; i < rowsize; i++)
-            {
-                dane[i, 0] = data[i, 0];
-                for (int e = 1; e < colsize; e++)
-                {
-                    if (i == 0)
-                    {
-                        if (e == 1)
-                            dane[i, e] = data[i, e];
-                        else
-                            dane[i, e] = dane[i, e - 1] + data[i, e];
-                    }
-                    else
-                    {
-                        if (e == 1)
-                            dane[i, e] = dane[i - 1, e] + data[i, e];
-                        else
-                        {
-                            if (dane[i, e - 1] > dane[i - 1, e])
-                            {
-                                dane[i, e] = dane[i, e - 1] + data[i, e];
-                            }
-                            else
-                            {
-                                dane[i, e] = dane[i - 1, e] + data[i, e];
-                            }
-                        }
-                    }
-                }
-                Console.WriteLine(dane[i, 0] + " " + dane[i, 1] + " " + dane[i, 2] + " " + dane[i, 3] + " " + dane[i, 4] + " " + dane[i, 5] + " " + dane[i, 6] + " " + dane[i, 7]);
-            }*/
-            //Switch wybierający jaka metoda będzie wykonywana
+  
             Console.WriteLine("Wybierz metodę podając numer opcji:");
             Console.WriteLine("1.Algorytm genetyczny: Turniej");
             Console.WriteLine("2.Algorytm genetyczny: Ruletka");
             Console.WriteLine("3.Algorytm genetyczny: Ranking Liniowy");
+            Console.WriteLine("4.Algorytm Wspinaczki");
+            Console.WriteLine("5.Algorytm Wyżarzania");
+            Console.WriteLine("6.Algorytm TabuSearch");
+            Console.WriteLine("7.Algorytm Neh");
             rodzaj = Console.ReadLine();
+
+            if (Int32.Parse(rodzaj) !=5 && Int32.Parse(rodzaj) !=7) 
+            {
+                Console.WriteLine("Podaj liczbę pokoleń/powtórzeń:");
+                odp = Console.ReadLine();
+                Int32.TryParse(odp, out powtorzenia);
+            }
+            if (Int32.Parse(rodzaj)<4)
+            {
+                Console.WriteLine("Podaj liczbę rozwiązań do analizy (musi być parzysta):");
+                odp = Console.ReadLine();
+                Int32.TryParse(odp, out nrozwiazan);
+                Console.WriteLine("Podaj prawdopodobieństwo mutacji (liczba zmiennoprzecinkowa od 0 do 1):");
+                odp = Console.ReadLine();
+                mutacje = Double.Parse(odp);
+                Console.WriteLine("Podaj przedział (dwie liczby całkowite od 0 do {0}):", nrozwiazan);
+                odp = Console.ReadLine();
+                Int32.TryParse(odp, out przedzial[0]);
+                odp = Console.ReadLine();
+                Int32.TryParse(odp, out przedzial[1]);
+            }
+
             Random rnd = new Random();
             Random rdouble = new Random();
             Osobnik result = new Osobnik();
@@ -134,25 +161,49 @@ namespace ProjektIO2
             {
                 case "1":
                     {
-                        result=Turniej(data, rowsize, colsize,rnd);
+                        result=Turniej(data, rowsize, colsize,rnd,powtorzenia, nrozwiazan,mutacje,przedzial);
                         nazwa = "Turniej";
                         break;
                     }
                 case "2":
                     {
-                        result = Ruletka(data, rowsize, colsize, rnd, rdouble);
+                        result = Ruletka(data, rowsize, colsize, rnd, rdouble, powtorzenia, nrozwiazan, mutacje, przedzial);
                         nazwa = "Ruletka";
                         break;
                     }
                 case "3":
                     {
-                        result = RankingLiniowy(data, rowsize, colsize, rnd, rdouble);
+                        result = RankingLiniowy(data, rowsize, colsize, rnd, rdouble, powtorzenia, nrozwiazan, mutacje, przedzial);
                         nazwa = "RankingLiniowy";
+                        break;
+                    }
+                case "4":
+                    {
+                        result = Wspinaczka(data, rowsize, colsize, rnd, powtorzenia);
+                        nazwa = "Wspinaczka";
+                        break;
+                    }
+                case "5":
+                    {
+                        result = Wyzarzanie(data, rowsize, colsize, rnd,rdouble, powtorzenia);
+                        nazwa = "Wyzarzanie";
+                        break;
+                    }
+                case "6":
+                    {//(int[,] data, int rowsize, int colsize, Random rnd, int powtorzenia)
+                        result = TabuSearch(data, rowsize, colsize, rnd, powtorzenia);
+                        nazwa = "TabuSearch";
+                        break;
+                    }
+                case "7":
+                    {//(int[,] data, int rowsize, int colsize, Random rnd, int 
+                        result=Neh(data,rowsize,colsize);
+                        nazwa = "TabuSearch";
                         break;
                     }
                 default:
                     {
-                        result = Turniej(data, rowsize, colsize, rnd);
+                        result = Turniej(data, rowsize, colsize, rnd, powtorzenia, nrozwiazan, mutacje, przedzial);
                         nazwa = "Turniej";
                         break;
                     }
@@ -393,8 +444,31 @@ namespace ProjektIO2
             }
             return min;
         }
+        static int Findmax(List<Tabu> tab)//Funkcja pomocnicza do TabuSearch znajdująca najgorszy element listy top najlepszych rozwiązań
+        {
+            int iter = 0;
+            int max = tab[0].Licznik;
+            for (int i = 1; i < 5; i++)
+            {
+                if (max < tab[i].Licznik)
+                {
+                    max = tab[i].Licznik;
+                    iter = i;
+                }
+            }
+            return iter;
+        }
 
-        static Osobnik Turniej(int[,] dane, int rowsize, int colsize, Random rnd)
+        static int[] Swap(int[] Tab, int indeks)
+        {
+            int a = Tab[indeks];
+            Tab[indeks] = Tab[indeks + 1];
+            Tab[indeks + 1] = a;
+
+            return Tab;
+        }
+
+        static Osobnik Turniej(int[,] dane, int rowsize, int colsize, Random rnd,int powtorzenia, int nrozwiazan, double mutacje, int[] przedzial)
         {
             List<Osobnik> wyniki = new List<Osobnik>();
             Osobnik result = new Osobnik();
@@ -403,31 +477,7 @@ namespace ProjektIO2
             List<int> lista = new List<int>();
             List<Osobnik> LosowiOsobnicy = new List<Osobnik>();
             int zamiana;
-            string odp;
-            int powtorzenia = 10;
-            int nrozwiazan = 10;
             int glosowa = (int)(nrozwiazan * 0.3);//Ugrupowanie, z którego wybierany jest najlepsy wynik ma wielkość 30% liczby rozwiązań
-            double mutacje = 0.1;
-            int[] przedzial = new int[2];
-            przedzial[0] = 2;
-            przedzial[1] = 5;
-
-            Console.WriteLine("Podaj liczbę pokoleń:");
-            odp = Console.ReadLine();
-            Int32.TryParse(odp, out powtorzenia);
-
-            Console.WriteLine("Podaj liczbę rozwiązań do analizy (musi być parzysta):");
-            odp = Console.ReadLine();
-            Int32.TryParse(odp, out nrozwiazan);
-
-            Console.WriteLine("Podaj prawdopodobieństwo mutacji (liczba zmiennoprzecinkowa od 0 do 1):");
-            odp = Console.ReadLine();
-            mutacje = Double.Parse(odp);
-            Console.WriteLine("Podaj przedział (dwie liczby całkowite od 0 do {0}):",nrozwiazan);
-            odp = Console.ReadLine();
-            Int32.TryParse(odp, out przedzial[0]);
-            odp = Console.ReadLine();
-            Int32.TryParse(odp, out przedzial[1]);
 
             Osobnik[] osobnicyPomoc = new Osobnik[nrozwiazan];
             Osobnik[] osobnicy = new Osobnik[nrozwiazan];
@@ -487,42 +537,17 @@ namespace ProjektIO2
             return result;
         }
 
-        static Osobnik Ruletka(int[,] dane, int rowsize, int colsize, Random rnd,Random rdouble)
+        static Osobnik Ruletka(int[,] dane, int rowsize, int colsize, Random rnd,Random rdouble, int powtorzenia, int nrozwiazan, double mutacje, int[] przedzial)
         {
             Random rand = new Random();
             List<Osobnik> wyniki = new List<Osobnik>();
             List<Osobnik> LosowiOsobnicy = new List<Osobnik>();
             Osobnik result = new Osobnik();
-            int powtorzenia = 2;
-            int nrozwiazan = 10;
-            double mutacje = 0.1;
-            string odp;
             Osobnik[] pomocnicy = new Osobnik[2];
             List<int> mieszalnik = new List<int>();
             pomocnicy[0] = pomocnicy[1] = new Osobnik();
             int glosowa = (int)(nrozwiazan * 0.3);//Ugrupowanie, z którego wybierany jest najlepszy wynik ma wielkość 30% liczby rozwiązań
-            int[] przedzial = new int[2];
-            przedzial[0] = 2;
-            przedzial[1] = 5;
-
-            
-            Console.WriteLine("Podaj liczbę pokoleń:");
-            odp = Console.ReadLine();
-            Int32.TryParse(odp, out powtorzenia);
-
-            Console.WriteLine("Podaj liczbę rozwiązań do analizy (musi być parzysta):");
-            odp = Console.ReadLine();
-            Int32.TryParse(odp, out nrozwiazan);
-
-            Console.WriteLine("Podaj prawdopodobieństwo mutacji (liczba zmiennoprzecinkowa od 0 do 1):");
-            odp = Console.ReadLine();
-            mutacje = Double.Parse(odp);
-            
-            Console.WriteLine("Podaj przedział (dwie liczby całkowite od 0 do {0}):", nrozwiazan);
-            odp = Console.ReadLine();
-            Int32.TryParse(odp, out przedzial[0]);
-            odp = Console.ReadLine();
-            Int32.TryParse(odp, out przedzial[1]);
+                        
             Osobnik[] osobnicy = new Osobnik[nrozwiazan];
             Osobnik[] osobnicyPomoc = new Osobnik[nrozwiazan];
             //Losowanie początkowych ustawień zadań dla n-rozwiązań
@@ -593,42 +618,17 @@ namespace ProjektIO2
             return result;   
         }
 
-        static Osobnik RankingLiniowy(int[,] dane, int rowsize, int colsize, Random rnd, Random rdouble)
+        static Osobnik RankingLiniowy(int[,] dane, int rowsize, int colsize, Random rnd, Random rdouble, int powtorzenia, int nrozwiazan, double mutacje, int[] przedzial)
         {
             Random rand = new Random();
             List<Osobnik> wyniki = new List<Osobnik>();
             List<Osobnik> LosowiOsobnicy = new List<Osobnik>();
             Osobnik result = new Osobnik();
-            int powtorzenia = 2;
-            int nrozwiazan = 10;
-            double mutacje = 0.1;
-            string odp;
             Osobnik[] pomocnicy = new Osobnik[2];
             List<int> mieszalnik = new List<int>();
             pomocnicy[0] = pomocnicy[1] = new Osobnik();
             int glosowa = (int)(nrozwiazan * 0.3);//Ugrupowanie, z którego wybierany jest najlepszy wynik ma wielkość 30% liczby rozwiązań
-            int[] przedzial = new int[2];
-            przedzial[0] = 2;
-            przedzial[1] = 5;
 
-
-            Console.WriteLine("Podaj liczbę pokoleń:");
-            odp = Console.ReadLine();
-            Int32.TryParse(odp, out powtorzenia);
-
-            Console.WriteLine("Podaj liczbę rozwiązań do analizy (musi być parzysta):");
-            odp = Console.ReadLine();
-            Int32.TryParse(odp, out nrozwiazan);
-
-            Console.WriteLine("Podaj prawdopodobieństwo mutacji (liczba zmiennoprzecinkowa od 0 do 1):");
-            odp = Console.ReadLine();
-            mutacje = Double.Parse(odp);
-
-            Console.WriteLine("Podaj przedział (dwie liczby całkowite od 0 do {0}):", nrozwiazan);
-            odp = Console.ReadLine();
-            Int32.TryParse(odp, out przedzial[0]);
-            odp = Console.ReadLine();
-            Int32.TryParse(odp, out przedzial[1]);
             Osobnik[] osobnicy = new Osobnik[nrozwiazan];
             Osobnik[] osobnicyPomoc = new Osobnik[nrozwiazan];
             //Losowanie początkowych ustawień zadań dla n-rozwiązań
@@ -715,12 +715,232 @@ namespace ProjektIO2
             result = FindMin(wyniki, nrozwiazan);
             Console.WriteLine("Wynik końcowy: " + result.suma);
 
+            return result;
+        }
+        //(data, rowsize, colsize,rnd);
+        //(int[,] data, int rowsize, int colsize, Random rnd)
+        static Osobnik Wspinaczka(int[,] data, int rowsize, int colsize, Random rnd, int powtorzenia)
+        {
+            int j = 0;
+            Osobnik dane = new Osobnik();
+            Osobnik next = new Osobnik();
+            int zamiana = 0;
+            dane = Losowanie(data, rowsize, colsize, rnd);//Losowanie rozwiązania początkowego i obliczenie czasu zakończenia ostatniego zadania
 
+            for (int h = 0; h <powtorzenia; h++)//Zwiększenie wartości h polepszy końcowy wynik
+            {
+                //Losowanie dwóch indeksów do zamiany
+                int i1 = rnd.Next(0, rowsize);
+                int i2 = rnd.Next(0, rowsize);
+                //Zamiana indeksów w nowej tablicy
+                next = dane;
+                next.Tab[i1] = dane.Tab[i2];
+                next.Tab[i2] = dane.Tab[i1];
+                next = Zlicz(next.Tab, data, rowsize, colsize);//Liczenie nowej wartości czasu zakończenia ostatniego zadania
 
+                Console.WriteLine("Iteracja: " + h + " Poprzednia suma: " + dane.suma + " Obecna suma: " + next.suma + " Liczba zamian: " + zamiana);
+                if (dane.suma > next.suma)//Jeżeli stara wartość sumy odchyleń jest większa od obecnej to następuje zamiana
+                {
+                    dane = next;
+                    zamiana++;
+                }
+            }
+            Console.WriteLine("Wynik końcowy: " + dane.suma);
+            return dane;
+        }
+
+        static Osobnik Wyzarzanie(int[,] data, int rowsize, int colsize, Random rnd, Random rdouble, int powtorzenia)
+        {
+            string odp;
+            int j = 0;
+            Osobnik next = new Osobnik();
+            Osobnik dane = new Osobnik();
+            j = 0;
+            double proba = 0.0;
+            double alpha = 0.999;
+            double temp = 10000000000.0; //Zmieniając te wartości
+            double ep = 0.000001; //można dojść do polepszenia wyniku
+            int delta;
+            dane = Losowanie(data, rowsize, colsize, rnd);//Losowanie rozwiązania początkowego i czasu zakończenia ostatniego zadania
+            
+            Console.WriteLine("Podaj wartość alpha:");
+            odp = Console.ReadLine();
+            alpha = Convert.ToDouble(odp);
+            Console.WriteLine("Podaj wartość temperatury:");
+            odp = Console.ReadLine();
+            temp = Convert.ToDouble(odp);
+            Console.WriteLine("Podaj wartość epsilon:");
+            odp = Console.ReadLine();
+            ep = Convert.ToDouble(odp);
+
+            while (temp > ep)//Dopóki temperatura jest większa od episilon, będą wykonywane kolejne iteracje polepszania wyniku
+            {
+                next = dane;//przypisywanie wartości z pierwotnej tablicy do nowej tablicy
+                //Losowanie dwóch indeksów do zamiany
+                int i1 = rnd.Next(0,rowsize);
+                int i2 = rnd.Next(0, rowsize);
+                //Zamiana indeksów w nowej tablicy
+                next.Tab[i1] = dane.Tab[i2];
+                next.Tab[i2] = dane.Tab[i1];
+                next=Zlicz(next.Tab, data, rowsize, colsize);//Liczenie nowej wartości sumy odchyleń
+
+                delta = next.suma-dane.suma;//Liczenie delty dla obecnego rozwiązania
+                Console.WriteLine("Poprzednia suma: " + dane.suma + " Obecna suma: " + next.suma+ " delta: "+delta);
+                if (delta < 0)//Jeżeli stara wartość sumy odchyleń jest większa od obecnej to następuje zamiana
+                {
+                    dane = next;
+                }
+                else
+                {
+                    proba = rdouble.NextDouble();//W przeciwnym przypadku zamiana następuje z prawdopodobienstwem exp(-delta/temp))
+                    if (proba < Math.Exp(-delta / temp))
+                    {
+                        dane = next;
+                    }
+                }
+                temp *= alpha;//Następuje zmiana temperatury
+            }
+            Console.WriteLine("Wynik końcowy: " + dane.suma);
+            return dane;
+        }
+
+        static Osobnik TabuSearch(int[,] data, int rowsize, int colsize, Random rnd, int powtorzenia)
+        {
+            int j = 0;
+            Tabu t = new Tabu();
+            int iterator = 0;
+            Osobnik next = new Osobnik();
+            Osobnik dane = new Osobnik();
+            Queue<Tabu> lista = new Queue<Tabu>();
+            List<Tabu> top = new List<Tabu>();
+            dane = Losowanie(data, rowsize, colsize, rnd);//Losowanie rozwiązania początkowego i obliczanie czasu zakończenia ostatniego zadania
+            dane = Zlicz(dane.Tab, data, rowsize, colsize);
+            top = new List<Tabu>();
+            //Część główna
+            for (int h = 0; h <powtorzenia; h++)//Zwiększenie wartości h polepszy końcowy wynik
+            { //Usuwanie przedawnionych zamian z listy Tabu (od drugiej iteracji)
+                top = new List<Tabu>();
+                bool outcome = false;
+                iterator = 0;
+                Tabu result = new Tabu();
+                if (h > 0)
+                {
+                    Tabu pomoc = lista.Peek();
+                    if (pomoc.Licznik == 0)
+                    {
+                        lista.Dequeue();
+                        pomoc = lista.Peek();
+                    }
+                }
+                for (int x = 0; x < rowsize; x++)//Analiza poszczególnych przypadków
+                {
+                    for (int y = x + 1; y < rowsize; y++)
+                    {
+                        //przypisywanie wartości z pierwotnej tablicy do nowej tablicy
+                        next = dane;
+                        //Zamiana wartości w nowej tablicy dla indeksów x i y
+                        next.Tab[x] = data[y,0];
+                        next.Tab[y] = data[x,0];
+
+                        next = Zlicz(next.Tab, data, rowsize, colsize);//Liczenie nowej wartości czasu zakończenia ostatniego zadania
+                        Console.WriteLine("Iteracja: " + h + " Pierwszy indeks: " + x + " Wynik pośredni: " + next.suma+" "+dane.suma);
+                        //Tworzenie listy top 5 najlepszych rozwiązań
+                        if (iterator < 5)//Najpierw lista uzupełniana jest 5 pierwszymi rozwiązaniami
+                        {
+                            t = new Tabu(x, y, next.suma);
+                            top.Add(t);
+                            iterator++;
+                        }
+                        else
+                        {
+                            if (top[Findmax(top)].Licznik > next.suma)//Jeżeli obecna suma jest mniejsza od najgorszego rozwiązania z listy top to w miejsce najgorzego wyniku wpisywana jest obecna suma
+                                top[Findmax(top)] = new Tabu(x, y, next.suma);
+                            iterator++;
+                        }
+                    }
+                }
+                //Wybór rozwiązania
+                if (lista.Count > 0)
+                {//Sprawdzenie, czy najlepsze rozwiązanie z top nie pojawiło się na liście tabu
+                    for (int i = 0; outcome == false || i < 5; i++)
+                    {
+                        t.A = top[i].A;
+                        t.B = top[i].B;
+                        iterator = 0;
+                        for (j = 1; j <= 3; j++)
+                        {
+                            t.Licznik = j;
+                            if (lista.Contains(t) == false)
+                            {
+                                iterator++;
+                            }
+                        }
+                        if (iterator == 3)
+                        {//Zapisanie najlepszego dozwolonego wyniku na listę Tabu
+                            result = t;
+                            result.Licznik = 4;
+                            lista.Enqueue(result);
+                            outcome = true;
+                        }
+
+                    }
+                }
+                else
+                {//Zapisanie najlepszego wyniku na listę Tabu
+                    result.A = top[0].A;
+                    result.B = top[0].B;
+                    result.Licznik = 4;
+                    lista.Enqueue(result);
+                    outcome = true;
+                }
+                //Zamiana indeksów w nowej tablicy na wartości z najlepszego wyniku
+                next = dane;
+                next.Tab[result.A] = data[result.B,0];
+                next.Tab[result.B] = data[result.A,0];
+                dane = Zlicz(next.Tab, data, rowsize, colsize);//Liczenie nowej wartości sumy odchyleń
+                
+                Console.WriteLine("Iteracja: " + h + "                      Wynik:          " + dane.suma);
+                foreach (Tabu tb in lista)//Pomniejszanie wartości liczącej ile razy zamiana nie może nastąpić przy poszczególnych indeksach
+                {
+                    tb.Licznik--;
+                }
+            }
+            Console.WriteLine("Wynik końcowy:                                   " + dane.suma);
+            return dane;
+        }
+
+        static Osobnik Neh(int[,] data,int rowsize, int colsize)
+        {
+            Osobnik pomocnik = new Osobnik();
+            Osobnik result = new Osobnik();
+            int[,] Tab = new int[rowsize,colsize];
+            int[] kolejnosc = new int[rowsize];
+            for (int h = 0; h < colsize; h++)//Tablica z pierwszym zadaniem 
+                Tab[0, h] = data[0, h];
+            kolejnosc[0] = data[0, 0];
+
+            for(int h=1;h< rowsize; h++)
+            {
+                kolejnosc[h] = data[h, 0];//Dodanie kolejnoeg zadania
+                for (int j = 0; j < colsize; j++)
+                    Tab[h, j] = data[h, j];
+                result=pomocnik = Zlicz(kolejnosc, data, (h+1),colsize);//Pierwsze ustawienie i czas zakończenia ostatniego zadania
+                Console.WriteLine(h + " " + " Pomocnik: " + pomocnik.suma + " Result: " + result.suma);
+                for (int i=h-1;i>=0;i--)
+                {
+                    kolejnosc = Swap(kolejnosc, i);//Zamiana kolejności zadań
+                    pomocnik = Zlicz(kolejnosc, data, (h + 1), colsize);//Czas zakończenia ostatniego zadania dla nowego ustawienia
+                    if (result.suma > pomocnik.suma)//Jeżeli najlepszy dotychczasowy wynik jest większy od obecnie badanego ustawienia to następuje aktualizacja nalepszego ustawienia
+                        result = pomocnik;
+
+                    Console.WriteLine(h + " " + i + " Pomocnik: " +pomocnik.suma+" Result: "+result.suma);
+                    
+                }
+
+            }
 
             return result;
         }
-
 
 
     }

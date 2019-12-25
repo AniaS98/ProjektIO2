@@ -80,15 +80,33 @@ namespace ProjektIO2
             string plik;
             string rodzaj;
             Console.WriteLine("Wybierz plik do wczytania podając numer opcji:");//Switch służacy wybieraniu pliku z jakiego mają być odczytywane dane
-            Console.WriteLine("1.67 zadań na 7 maszynach");
+            Console.WriteLine("0.Dane  -  67 zadań na  7 maszynach");
+            Console.WriteLine("1.Dane1 -  50 zadań na 10 maszynach");
+            Console.WriteLine("2.Dane2 - 100 zadań na 20 maszynach");
+            Console.WriteLine("3.Dane3 - 200 zadań na 20 maszynach");
             rodzaj = Console.ReadLine();
             switch (rodzaj)
             {
-                case "1":
+                case "0":
                 {
                     plik = "Dane.xls";
                     break;
                 }
+                case "1":
+                    {
+                        plik = "Dane1.xls";
+                        break;
+                    }
+                case "2":
+                    {
+                        plik = "Dane2.xls";
+                        break;
+                    }
+                case "3":
+                    {
+                        plik = "Dane3.xls";
+                        break;
+                    }
                 default:
                 {
                     plik = "Dane.xls";
@@ -100,7 +118,7 @@ namespace ProjektIO2
             string PathConn = "Provider=Microsoft.Jet.OLEDB.4.0; Data Source=" + plik + "; Extended Properties=\"Excel 8.0;HDR=Yes;\";";
             OleDbConnection conn = new OleDbConnection(PathConn);
             OleDbDataAdapter myDataAdapter = new OleDbDataAdapter("Select * from [Dane$]", conn);
-            DataSet ds = new DataSet();
+            DataSet ds = new DataSet();//Dane muszą być zapisane w formacie xls!!!
             myDataAdapter.Fill(ds);
             int rowsize = ds.Tables[0].Rows.Count;
             int colsize = ds.Tables[0].Columns.Count;
@@ -119,7 +137,7 @@ namespace ProjektIO2
                 {
                     data[i, j] = Int32.Parse(ds.Tables[0].Rows[i][j].ToString());
                 }
-                //Console.WriteLine(data[i, 0] + " " + data[i, 1] + " " + data[i, 2] + " " + data[i, 3] + " " + data[i, 4] + " " + data[i, 5] + " " + data[i, 6] + " " + data[i, 7]);
+                Console.WriteLine(data[i, 0] + " " + data[i, 1] + " " + data[i, 2] + " " + data[i, 3] + " " + data[i, 4] + " " + data[i, 5] + " " + data[i, 6] + " " + data[i, 7]);
             }
   
             Console.WriteLine("Wybierz metodę podając numer opcji:");
@@ -936,6 +954,7 @@ namespace ProjektIO2
                     Console.WriteLine(h + " " + i + " Pomocnik: " +pomocnik.suma+" Result: "+result.suma);
                     
                 }
+                kolejnosc = result.Tab;
 
             }
 

@@ -216,7 +216,7 @@ namespace ProjektIO2
                 case "7":
                     {//(int[,] data, int rowsize, int colsize, Random rnd, int 
                         result=Neh(data,rowsize,colsize);
-                        nazwa = "TabuSearch";
+                        nazwa = "NEH";
                         break;
                     }
                 default:
@@ -743,6 +743,7 @@ namespace ProjektIO2
             Osobnik dane = new Osobnik();
             Osobnik next = new Osobnik();
             int zamiana = 0;
+            int pomocnik = 0;
             dane = Losowanie(data, rowsize, colsize, rnd);//Losowanie rozwiązania początkowego i obliczenie czasu zakończenia ostatniego zadania
 
             for (int h = 0; h <powtorzenia; h++)//Zwiększenie wartości h polepszy końcowy wynik
@@ -752,8 +753,9 @@ namespace ProjektIO2
                 int i2 = rnd.Next(0, rowsize);
                 //Zamiana indeksów w nowej tablicy
                 next = dane;
-                next.Tab[i1] = dane.Tab[i2];
-                next.Tab[i2] = dane.Tab[i1];
+                pomocnik = next.Tab[i1];
+                next.Tab[i1] = next.Tab[i2];
+                next.Tab[i2] = pomocnik;
                 next = Zlicz(next.Tab, data, rowsize, colsize);//Liczenie nowej wartości czasu zakończenia ostatniego zadania
 
                 Console.WriteLine("Iteracja: " + h + " Poprzednia suma: " + dane.suma + " Obecna suma: " + next.suma + " Liczba zamian: " + zamiana);

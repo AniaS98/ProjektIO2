@@ -53,8 +53,8 @@ namespace ProjektIO2
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append(a.ToString());
-            sb.Append(b.ToString());
+            sb.Append(a.ToString()+" ");
+            sb.Append(b.ToString() + " ");
             sb.Append(licznik.ToString());
             return sb.ToString();
         }
@@ -477,6 +477,17 @@ namespace ProjektIO2
             return iter;
         }
 
+        static Tabu FindBest(List<Tabu> tab)
+        {
+            Tabu min = tab[0];
+            for(int i=1;i<tab.Count;i++)
+            {
+                if (min.Licznik > tab[i].Licznik)
+                    min = tab[i];
+            }
+            return min;
+        }
+
         static int[] Swap(int[] Tab, int indeks)
         {
             int a = Tab[indeks];
@@ -781,6 +792,7 @@ namespace ProjektIO2
             double temp = 10000000000.0; //Zmieniając te wartości
             double ep = 0.000001; //można dojść do polepszenia wyniku
             int delta;
+            int pomocnik = 0;
             dane = Losowanie(data, rowsize, colsize, rnd);//Losowanie rozwiązania początkowego i czasu zakończenia ostatniego zadania
             
             Console.WriteLine("Podaj wartość alpha:");
@@ -800,9 +812,10 @@ namespace ProjektIO2
                 int i1 = rnd.Next(0,rowsize);
                 int i2 = rnd.Next(0, rowsize);
                 //Zamiana indeksów w nowej tablicy
-                next.Tab[i1] = dane.Tab[i2];
-                next.Tab[i2] = dane.Tab[i1];
-                next=Zlicz(next.Tab, data, rowsize, colsize);//Liczenie nowej wartości sumy odchyleń
+                pomocnik = next.Tab[i1];
+                next.Tab[i1] = next.Tab[i2];
+                next.Tab[i2] = pomocnik;
+                next =Zlicz(next.Tab, data, rowsize, colsize);//Liczenie nowej wartości sumy odchyleń
 
                 delta = next.suma-dane.suma;//Liczenie delty dla obecnego rozwiązania
                 Console.WriteLine("Poprzednia suma: " + dane.suma + " Obecna suma: " + next.suma+ " delta: "+delta);
@@ -826,6 +839,7 @@ namespace ProjektIO2
 
         static Osobnik TabuSearch(int[,] data, int rowsize, int colsize, Random rnd, int powtorzenia)
         {
+            int pomocnik = 0;
             int j = 0;
             Tabu t = new Tabu();
             int iterator = 0;
@@ -833,7 +847,9 @@ namespace ProjektIO2
             Osobnik dane = new Osobnik();
             Queue<Tabu> lista = new Queue<Tabu>();
             List<Tabu> top = new List<Tabu>();
-            dane = Losowanie(data, rowsize, colsize, rnd);//Losowanie rozwiązania początkowego i obliczanie czasu zakończenia ostatniego zadania
+            //dane = Losowanie(data, rowsize, colsize, rnd);//Losowanie rozwiązania początkowego i obliczanie czasu zakończenia ostatniego zadania
+            for (int i = 0; i < rowsize; i++)
+                dane.Tab[i] = data[i, 0];
             dane = Zlicz(dane.Tab, data, rowsize, colsize);
             top = new List<Tabu>();
             //Część główna
@@ -859,8 +875,9 @@ namespace ProjektIO2
                         //przypisywanie wartości z pierwotnej tablicy do nowej tablicy
                         next = dane;
                         //Zamiana wartości w nowej tablicy dla indeksów x i y
-                        next.Tab[x] = data[y,0];
-                        next.Tab[y] = data[x,0];
+                        pomocnik = dane.Tab[x];
+                        next.Tab[x] = dane.Tab[y];
+                        next.Tab[y] = pomocnik;
 
                         next = Zlicz(next.Tab, data, rowsize, colsize);//Liczenie nowej wartości czasu zakończenia ostatniego zadania
                         Console.WriteLine("Iteracja: " + h + " Pierwszy indeks: " + x + " Wynik pośredni: " + next.suma+" "+dane.suma);
@@ -870,11 +887,15 @@ namespace ProjektIO2
                             t = new Tabu(x, y, next.suma);
                             top.Add(t);
                             iterator++;
+                            Console.WriteLine(t.ToString());
                         }
                         else
                         {
                             if (top[Findmax(top)].Licznik > next.suma)//Jeżeli obecna suma jest mniejsza od najgorszego rozwiązania z listy top to w miejsce najgorzego wyniku wpisywana jest obecna suma
-                                top[Findmax(top)] = new Tabu(x, y, next.suma);
+                            {
+                                t=top[Findmax(top)] = new Tabu(x, y, next.suma);
+                                Console.WriteLine(t.ToString());
+                            }
                             iterator++;
                         }
                     }
@@ -907,18 +928,25 @@ namespace ProjektIO2
                 }
                 else
                 {//Zapisanie najlepszego wyniku na listę Tabu
-                    result.A = top[0].A;
-                    result.B = top[0].B;
+                    t = FindBest(top);
+                    result.A = t.A;
+                    result.B = t.B;
                     result.Licznik = 4;
+                    Console.WriteLine(t);
                     lista.Enqueue(result);
                     outcome = true;
                 }
                 //Zamiana indeksów w nowej tablicy na wartości z najlepszego wyniku
                 next = dane;
-                next.Tab[result.A] = data[result.B,0];
-                next.Tab[result.B] = data[result.A,0];
+                next.Tab[result.A-1] = result.A;
+                Console.WriteLine(next.Tab[result.A-1]);
+                next.Tab[result.B-1] = result.B;
+                Console.WriteLine(next.Tab[result.B-1]);
                 dane = Zlicz(next.Tab, data, rowsize, colsize);//Liczenie nowej wartości sumy odchyleń
-                
+                Console.WriteLine("\n");
+                for (int i = 0; i < 67; i++)
+                    Console.WriteLine(next.Tab[i]);
+                Console.WriteLine("\n");
                 Console.WriteLine("Iteracja: " + h + "                      Wynik:          " + dane.suma);
                 foreach (Tabu tb in lista)//Pomniejszanie wartości liczącej ile razy zamiana nie może nastąpić przy poszczególnych indeksach
                 {

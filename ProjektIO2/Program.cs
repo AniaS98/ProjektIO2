@@ -454,8 +454,7 @@ namespace ProjektIO2
 
         static Osobnik FindMin(List<Osobnik> grupa,int glosowa)//Znajdowanie najmniejszej wartości z badanego ugrupowania
         {
-            
-Osobnik min=grupa[0];
+            Osobnik min=grupa[0];
             for(int i=1;i<glosowa;i++)
             {
                 if (min.suma > grupa[i].suma)
@@ -771,8 +770,6 @@ Osobnik min=grupa[0];
                 next = Zlicz(next.Tab, data, rowsize, colsize);//Liczenie nowej wartości czasu zakończenia ostatniego zadania
 
                 Console.WriteLine("Iteracja: " + h + " Poprzednia suma: " + dane.suma + " Obecna suma: " + next.suma + " Liczba zamian: " + zamiana);
-                for(int i=0;i<rowsize;i++)
-                    Console.WriteLine(next.Tab1[i]);
                 if (dane.suma > next.suma)//Jeżeli stara wartość sumy odchyleń jest większa od obecnej to następuje zamiana
                 {
                     dane = next;
@@ -850,7 +847,9 @@ Osobnik min=grupa[0];
             Osobnik dane = new Osobnik();
             Queue<Tabu> lista = new Queue<Tabu>();
             List<Tabu> top = new List<Tabu>();
-            //dane = Losowanie(data, rowsize, colsize, rnd);//Losowanie rozwiązania początkowego i obliczanie czasu zakończenia ostatniego zadania
+            List<Osobnik> kolejnosc = new List<Osobnik>();
+            Osobnik Opomocnik = new Osobnik();
+            dane = Losowanie(data, rowsize, colsize, rnd);//Losowanie rozwiązania początkowego i obliczanie czasu zakończenia ostatniego zadania
             for (int i = 0; i < rowsize; i++)
                 dane.Tab[i] = data[i, 0];
             dane = Zlicz(dane.Tab, data, rowsize, colsize);
@@ -859,6 +858,7 @@ Osobnik min=grupa[0];
             for (int h = 0; h <powtorzenia; h++)//Zwiększenie wartości h polepszy końcowy wynik
             { //Usuwanie przedawnionych zamian z listy Tabu (od drugiej iteracji)
                 top = new List<Tabu>();
+                kolejnosc = new List<Osobnik>();
                 bool outcome = false;
                 iterator = 0;
                 Tabu result = new Tabu();
@@ -881,6 +881,8 @@ Osobnik min=grupa[0];
                         pomocnik = dane.Tab[x];
                         next.Tab[x] = dane.Tab[y];
                         next.Tab[y] = pomocnik;
+                        //for (int i = 0; i < 67; i++)
+                            //Console.WriteLine(next.Tab[i]);
 
                         next = Zlicz(next.Tab, data, rowsize, colsize);//Liczenie nowej wartości czasu zakończenia ostatniego zadania
                         Console.WriteLine("Iteracja: " + h + " Pierwszy indeks: " + x + " Wynik pośredni: " + next.suma+" "+dane.suma);
@@ -888,6 +890,8 @@ Osobnik min=grupa[0];
                         if (iterator < 5)//Najpierw lista uzupełniana jest 5 pierwszymi rozwiązaniami
                         {
                             t = new Tabu(x, y, next.suma);
+                            Opomocnik = new Osobnik(next.Tab, next.suma);
+                            kolejnosc.Add(Opomocnik);
                             top.Add(t);
                             iterator++;
                             Console.WriteLine(t.ToString());
@@ -896,13 +900,16 @@ Osobnik min=grupa[0];
                         {
                             if (top[Findmax(top)].Licznik > next.suma)//Jeżeli obecna suma jest mniejsza od najgorszego rozwiązania z listy top to w miejsce najgorzego wyniku wpisywana jest obecna suma
                             {
-                                t=top[Findmax(top)] = new Tabu(x, y, next.suma);
+                                int p = Findmax(top);
+                                t =top[p] = new Tabu(x, y, next.suma);
+                                kolejnosc[p] = new Osobnik(next.Tab, next.Suma);
                                 Console.WriteLine(t.ToString());
                             }
                             iterator++;
                         }
                     }
                 }
+                int wynik = -1;
                 //Wybór rozwiązania
                 if (lista.Count > 0)
                 {//Sprawdzenie, czy najlepsze rozwiązanie z top nie pojawiło się na liście tabu
@@ -926,30 +933,24 @@ Osobnik min=grupa[0];
                             lista.Enqueue(result);
                             outcome = true;
                         }
-
+                        wynik++;
                     }
                 }
                 else
                 {//Zapisanie najlepszego wyniku na listę Tabu
-                    t = FindBest(top);
                     result.A = t.A;
                     result.B = t.B;
                     result.Licznik = 4;
                     Console.WriteLine(t);
                     lista.Enqueue(result);
                     outcome = true;
+                    wynik++;
                 }
                 //Zamiana indeksów w nowej tablicy na wartości z najlepszego wyniku
-                next = dane;
-                next.Tab[result.A-1] = result.A;
-                Console.WriteLine(next.Tab[result.A-1]);
-                next.Tab[result.B-1] = result.B;
-                Console.WriteLine(next.Tab[result.B-1]);
+                next.Tab = kolejnosc[wynik].Tab;
+                wynik = 0;
                 dane = Zlicz(next.Tab, data, rowsize, colsize);//Liczenie nowej wartości sumy odchyleń
-                Console.WriteLine("\n");
-                for (int i = 0; i < 67; i++)
-                    Console.WriteLine(next.Tab[i]);
-                Console.WriteLine("\n");
+
                 Console.WriteLine("Iteracja: " + h + "                      Wynik:          " + dane.suma);
                 foreach (Tabu tb in lista)//Pomniejszanie wartości liczącej ile razy zamiana nie może nastąpić przy poszczególnych indeksach
                 {

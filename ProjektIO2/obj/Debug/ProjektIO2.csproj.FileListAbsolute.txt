@@ -12,3 +12,10 @@ D:\adm\Documents\STUDIA\V Semestr\Inteligencja Obliczeniowa\ProjektIO2\ProjektIO
 D:\adm\Documents\STUDIA\V Semestr\Inteligencja Obliczeniowa\ProjektIO2\ProjektIO2\obj\Debug\ProjektIO2.csproj.CoreCompileInputs.cache
 D:\adm\Documents\STUDIA\V Semestr\Inteligencja Obliczeniowa\ProjektIO2\ProjektIO2\obj\Debug\ProjektIO2.exe
 D:\adm\Documents\STUDIA\V Semestr\Inteligencja Obliczeniowa\ProjektIO2\ProjektIO2\obj\Debug\ProjektIO2.pdb
+C:\Users\Tala\Source\Repos\AniaS98\ProjektIO2\ProjektIO2\bin\Debug\ProjektIO2.exe.config
+C:\Users\Tala\Source\Repos\AniaS98\ProjektIO2\ProjektIO2\bin\Debug\ProjektIO2.exe
+C:\Users\Tala\Source\Repos\AniaS98\ProjektIO2\ProjektIO2\bin\Debug\ProjektIO2.pdb
+C:\Users\Tala\Source\Repos\AniaS98\ProjektIO2\ProjektIO2\obj\Debug\ProjektIO2.csprojAssemblyReference.cache
+C:\Users\Tala\Source\Repos\AniaS98\ProjektIO2\ProjektIO2\obj\Debug\ProjektIO2.csproj.CoreCompileInputs.cache
+C:\Users\Tala\Source\Repos\AniaS98\ProjektIO2\ProjektIO2\obj\Debug\ProjektIO2.exe
+C:\Users\Tala\Source\Repos\AniaS98\ProjektIO2\ProjektIO2\obj\Debug\ProjektIO2.pdb

@@ -454,7 +454,8 @@ namespace ProjektIO2
 
         static Osobnik FindMin(List<Osobnik> grupa,int glosowa)//Znajdowanie najmniejszej wartości z badanego ugrupowania
         {
-            Osobnik min=grupa[0];
+            
+Osobnik min=grupa[0];
             for(int i=1;i<glosowa;i++)
             {
                 if (min.suma > grupa[i].suma)
@@ -757,6 +758,8 @@ namespace ProjektIO2
                 next = Zlicz(next.Tab, data, rowsize, colsize);//Liczenie nowej wartości czasu zakończenia ostatniego zadania
 
                 Console.WriteLine("Iteracja: " + h + " Poprzednia suma: " + dane.suma + " Obecna suma: " + next.suma + " Liczba zamian: " + zamiana);
+                for(int i=0;i<rowsize;i++)
+                    Console.WriteLine(next.Tab1[i]);
                 if (dane.suma > next.suma)//Jeżeli stara wartość sumy odchyleń jest większa od obecnej to następuje zamiana
                 {
                     dane = next;

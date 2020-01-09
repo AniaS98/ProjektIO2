@@ -839,6 +839,13 @@ namespace ProjektIO2
 
         static Osobnik TabuSearch(int[,] data, int rowsize, int colsize, Random rnd, int powtorzenia)
         {
+            string odp;
+            int wielkosc = 0;
+
+            Console.WriteLine("Podaj wielkość listy Tabu (całkowita, mniejsza od {0})",(rowsize-1));
+            odp = Console.ReadLine();
+            Int32.TryParse(odp, out wielkosc);
+
             int pomocnik = 0;
             int j = 0;
             Tabu t = new Tabu();
@@ -929,7 +936,7 @@ namespace ProjektIO2
                         if (iterator == 3)
                         {//Zapisanie najlepszego dozwolonego wyniku na listę Tabu
                             result = t;
-                            result.Licznik = 4;
+                            result.Licznik = wielkosc+1;
                             lista.Enqueue(result);
                             outcome = true;
                         }
@@ -940,7 +947,7 @@ namespace ProjektIO2
                 {//Zapisanie najlepszego wyniku na listę Tabu
                     result.A = t.A;
                     result.B = t.B;
-                    result.Licznik = 4;
+                    result.Licznik = wielkosc+1;
                     Console.WriteLine(t);
                     lista.Enqueue(result);
                     outcome = true;
@@ -994,5 +1001,7 @@ namespace ProjektIO2
 
             return result;
         }
+
+
     }
 }

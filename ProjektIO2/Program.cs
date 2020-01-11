@@ -130,6 +130,7 @@ namespace ProjektIO2
             int[] przedzial = new int[2];
             przedzial[0] = przedzial[1] = 0;
             double mutacje=0.1;
+            int wariant = 0;
             //int[,] dane = new int[rowsize, colsize];
             for (int i=0;i<rowsize; i++)
             {
@@ -169,6 +170,9 @@ namespace ProjektIO2
                 Int32.TryParse(odp, out przedzial[0]);
                 odp = Console.ReadLine();
                 Int32.TryParse(odp, out przedzial[1]);
+                Console.WriteLine("Wybierz sposób krzyżowania wybierając 1 lub 2");
+                odp = Console.ReadLine();
+                Int32.TryParse(odp, out wariant);
             }
 
             Random rnd = new Random();
@@ -179,19 +183,19 @@ namespace ProjektIO2
             {
                 case "1":
                     {
-                        result=Turniej(data, rowsize, colsize,rnd,powtorzenia, nrozwiazan,mutacje,przedzial);
+                        result=Turniej(data, rowsize, colsize,rnd,powtorzenia, nrozwiazan,mutacje,przedzial, wariant);
                         nazwa = "Turniej";
                         break;
                     }
                 case "2":
                     {
-                        result = Ruletka(data, rowsize, colsize, rnd, rdouble, powtorzenia, nrozwiazan, mutacje, przedzial);
+                        result = Ruletka(data, rowsize, colsize, rnd, rdouble, powtorzenia, nrozwiazan, mutacje, przedzial, wariant);
                         nazwa = "Ruletka";
                         break;
                     }
                 case "3":
                     {
-                        result = RankingLiniowy(data, rowsize, colsize, rnd, rdouble, powtorzenia, nrozwiazan, mutacje, przedzial);
+                        result = RankingLiniowy(data, rowsize, colsize, rnd, rdouble, powtorzenia, nrozwiazan, mutacje, przedzial, wariant);
                         nazwa = "RankingLiniowy";
                         break;
                     }
@@ -221,7 +225,7 @@ namespace ProjektIO2
                     }
                 default:
                     {
-                        result = Turniej(data, rowsize, colsize, rnd, powtorzenia, nrozwiazan, mutacje, przedzial);
+                        result = Turniej(data, rowsize, colsize, rnd, powtorzenia, nrozwiazan, mutacje, przedzial, wariant);
                         nazwa = "Turniej";
                         break;
                     }
@@ -309,8 +313,8 @@ namespace ProjektIO2
             Console.WriteLine(result.suma);
             return result;
         }
-        //Tworzenie dzieci z dwóch najlepszych osobników lub przejście rodziców do pokolenia dzieci w razie mutacji
-        static Osobnik[] Krzyzowanie(Osobnik a, Osobnik b, int[] przedzial, int rozmiar, int colsize, double mutacje, int[,] data, Random rdouble, Random rand)
+        //Tworzenie dzieci z dwóch najlepszych osobników lub przejście rodziców do pokolenia dzieci w razie mutacji - Krzyżowanie dwupunktowe
+        static Osobnik[] Krzyzowanie1(Osobnik a, Osobnik b, int[] przedzial, int rozmiar, int colsize, double mutacje, int[,] data, Random rdouble, Random rand)
         {
             Osobnik[] dzieci = new Osobnik[2];
             List<int> lista1 = new List<int>();
@@ -413,6 +417,150 @@ namespace ProjektIO2
 
             return dzieci;
         }
+        //Krzyżowanie jednorodne
+        static Osobnik[] Krzyzowanie2(Osobnik a, Osobnik b, int rozmiar, int colsize, double mutacje, int[,] data, Random rdouble, Random rand)
+        {
+            Osobnik[] dzieci = new Osobnik[2];
+            List<int> lista1 = new List<int>();
+            List<int> lista2 = new List<int>();
+            int k;
+            int i;
+            int numer;
+
+            dzieci[0] = new Osobnik();
+            dzieci[1] = new Osobnik();
+            //Tworzenie 1. dziecka
+            for (i = 0; i < rozmiar; i++)//Osobnik A i B
+            {
+                lista1.Add(a.Tab[i]);
+                lista2.Add(b.Tab[i]);
+            }
+            for(i = 0; i < rozmiar; i++)
+            {
+                numer = rand.Next(0, 100);
+                if (numer > 50)
+                {
+                    if(lista1.Contains(a.Tab[i]))
+                    {
+                        dzieci[0].Tab[i] = a.Tab[i];
+                        lista1.Remove(a.Tab[i]);
+                        lista2.Remove(a.Tab[i]);
+                    }    
+                    else if (lista2.Contains(b.Tab[i]))
+                    {
+                        dzieci[0].Tab[i] = b.Tab[i];
+                        lista1.Remove(b.Tab[i]);
+                        lista2.Remove(b.Tab[i]);
+                    }
+                    else
+                    {
+                        dzieci[0].Tab[i] = a.Tab[0];
+                        lista1.Remove(a.Tab[0]);
+                        lista2.Remove(a.Tab[0]);
+                    }
+                }   
+                else
+                {
+                    if (lista2.Contains(b.Tab[i]))
+                    {
+                        dzieci[0].Tab[i] = b.Tab[i];
+                        lista1.Remove(b.Tab[i]);
+                        lista2.Remove(b.Tab[i]);
+                    }
+                    else if (lista2.Contains(a.Tab[i]))
+                    {
+                        dzieci[0].Tab[i] = a.Tab[i];
+                        lista1.Remove(a.Tab[i]);
+                        lista2.Remove(a.Tab[i]);
+                    }
+                    else
+                    {
+                        dzieci[0].Tab[i] = b.Tab[0];
+                        lista1.Remove(b.Tab[0]);
+                        lista2.Remove(b.Tab[0]);
+                    }
+                }
+            }
+            //Tworzenie 2. dziecka
+            for (i = 0; i < rozmiar; i++)//Osobnik A i B
+            {
+                lista1.Add(a.Tab[i]);
+                lista2.Add(b.Tab[i]);
+            }
+            for (i = 0; i < rozmiar; i++)
+            {
+                numer = rand.Next(0, 100);
+                if (numer > 50)
+                {
+                    if (lista1.Contains(a.Tab[i]))
+                    {
+                        dzieci[1].Tab[i] = a.Tab[i];
+                        lista1.Remove(a.Tab[i]);
+                        lista2.Remove(a.Tab[i]);
+                    }
+                    else if (lista2.Contains(b.Tab[i]))
+                    {
+                        dzieci[1].Tab[i] = b.Tab[i];
+                        lista1.Remove(b.Tab[i]);
+                        lista2.Remove(b.Tab[i]);
+                    }
+                    else
+                    {
+                        dzieci[1].Tab[i] = a.Tab[0];
+                        lista1.Remove(a.Tab[0]);
+                        lista2.Remove(a.Tab[0]);
+                    }
+                }
+                else
+                {
+                    if (lista2.Contains(b.Tab[i]))
+                    {
+                        dzieci[1].Tab[i] = b.Tab[i];
+                        lista1.Remove(b.Tab[i]);
+                        lista2.Remove(b.Tab[i]);
+                    }
+                    else if (lista2.Contains(a.Tab[i]))
+                    {
+                        dzieci[1].Tab[i] = a.Tab[i];
+                        lista1.Remove(a.Tab[i]);
+                        lista2.Remove(a.Tab[i]);
+                    }
+                    else
+                    {
+                        dzieci[1].Tab[i] = b.Tab[0];
+                        lista1.Remove(b.Tab[0]);
+                        lista2.Remove(b.Tab[0]);
+                    }
+                }
+            }
+
+            numer = 0;
+            if (rdouble.NextDouble() > mutacje)//Jeżeli liczba losowa jest większa niż badana wartość współczynnika mutacji, to ta nie nastąpi
+            {
+                for (i = 0; i < rozmiar; i++)
+                {
+                    if (dzieci[0].Tab[i] == dzieci[1].Tab[i])
+                        numer++;
+                }
+                if (numer == rozmiar - 2)//Jeżeli mutacja następuje, a losowa jest większa od współczynnika mutacji to rodzice przechodzą od razu pokolenia dzieci
+                {
+                    dzieci[0] = a;
+                    dzieci[1] = b;
+                }
+                else
+                {
+                    dzieci[0] = Zlicz(dzieci[0].Tab, data, rozmiar, colsize);
+                    dzieci[1] = Zlicz(dzieci[1].Tab, data, rozmiar, colsize);
+                }
+            }
+            else
+            {
+                dzieci[0] = Zlicz(dzieci[0].Tab, data, rozmiar, colsize);
+                dzieci[1] = Zlicz(dzieci[1].Tab, data, rozmiar, colsize);
+            }
+            
+            return dzieci;
+        }
 
         static void Zapis(Osobnik osobnik,string nazwa)
         {
@@ -497,7 +645,7 @@ namespace ProjektIO2
             return Tab;
         }
 
-        static Osobnik Turniej(int[,] dane, int rowsize, int colsize, Random rnd,int powtorzenia, int nrozwiazan, double mutacje, int[] przedzial)
+        static Osobnik Turniej(int[,] dane, int rowsize, int colsize, Random rnd,int powtorzenia, int nrozwiazan, double mutacje, int[] przedzial, int wariant)
         {
             List<Osobnik> wyniki = new List<Osobnik>();
             Osobnik result = new Osobnik();
@@ -541,8 +689,10 @@ namespace ProjektIO2
                     pomocnicy[1] = FindMin(LosowiOsobnicy, glosowa-1);//Wybór drugiego najlepszego wyniku
                     //Console.WriteLine("Rodzic 1: " + pomocnicy[0].suma);
                     //Console.WriteLine("Rodzic 2: " + pomocnicy[1].suma);
-
-                    pomocnicy = Krzyzowanie(pomocnicy[0], pomocnicy[1], przedzial, rowsize, colsize, mutacje, dane, rdouble, rand);//Tworzenie dzieci z wybranych rodziców
+                    if(wariant==0)
+                        pomocnicy = Krzyzowanie1(pomocnicy[0], pomocnicy[1], przedzial, rowsize, colsize, mutacje, dane, rdouble, rand);//Tworzenie dzieci z wybranych rodziców
+                    else
+                        pomocnicy = Krzyzowanie2(pomocnicy[0], pomocnicy[1], rowsize, colsize, mutacje, dane, rdouble, rand);
                     osobnicyPomoc[j] = pomocnicy[0];
                     osobnicyPomoc[j + 1] = pomocnicy[1];
 
@@ -566,7 +716,7 @@ namespace ProjektIO2
             return result;
         }
 
-        static Osobnik Ruletka(int[,] dane, int rowsize, int colsize, Random rnd,Random rdouble, int powtorzenia, int nrozwiazan, double mutacje, int[] przedzial)
+        static Osobnik Ruletka(int[,] dane, int rowsize, int colsize, Random rnd,Random rdouble, int powtorzenia, int nrozwiazan, double mutacje, int[] przedzial, int wariant)
         {
             Random rand = new Random();
             List<Osobnik> wyniki = new List<Osobnik>();
@@ -617,8 +767,10 @@ namespace ProjektIO2
                     //Console.WriteLine("Rodzic 1: " + pomocnicy[0].suma);
                     //Console.WriteLine("Rodzic 2: " + pomocnicy[1].suma);
 
-
-                    pomocnicy = Krzyzowanie(pomocnicy[0], pomocnicy[1], przedzial, rowsize, colsize, mutacje, dane, rdouble, rand);//Tworzenie dzieci z wybranych rodziców
+                    if(wariant==0)
+                        pomocnicy = Krzyzowanie1(pomocnicy[0], pomocnicy[1], przedzial, rowsize, colsize, mutacje, dane, rdouble, rand);//Tworzenie dzieci z wybranych rodziców
+                    else
+                        pomocnicy = Krzyzowanie2(pomocnicy[0], pomocnicy[1], rowsize, colsize, mutacje, dane, rdouble, rand);
                     osobnicyPomoc[j] = pomocnicy[0];
                     osobnicyPomoc[j + 1] = pomocnicy[1];
 
@@ -647,7 +799,7 @@ namespace ProjektIO2
             return result;   
         }
 
-        static Osobnik RankingLiniowy(int[,] dane, int rowsize, int colsize, Random rnd, Random rdouble, int powtorzenia, int nrozwiazan, double mutacje, int[] przedzial)
+        static Osobnik RankingLiniowy(int[,] dane, int rowsize, int colsize, Random rnd, Random rdouble, int powtorzenia, int nrozwiazan, double mutacje, int[] przedzial, int wariant)
         {
             Random rand = new Random();
             List<Osobnik> wyniki = new List<Osobnik>();
@@ -718,8 +870,10 @@ namespace ProjektIO2
                     //Console.WriteLine("Rodzic 1: " + pomocnicy[0].suma);
                     //Console.WriteLine("Rodzic 2: " + pomocnicy[1].suma);
 
-
-                    pomocnicy = Krzyzowanie(pomocnicy[0], pomocnicy[1], przedzial, rowsize, colsize, mutacje, dane, rdouble, rand);//Tworzenie dzieci z wybranych rodziców
+                    if(wariant==0)
+                        pomocnicy = Krzyzowanie1(pomocnicy[0], pomocnicy[1], przedzial, rowsize, colsize, mutacje, dane, rdouble, rand);//Tworzenie dzieci z wybranych rodziców
+                    else
+                        pomocnicy = Krzyzowanie2(pomocnicy[0], pomocnicy[1], rowsize, colsize, mutacje, dane, rdouble, rand);
                     osobnicyPomoc[j] = pomocnicy[0];
                     osobnicyPomoc[j + 1] = pomocnicy[1];
 
@@ -839,6 +993,13 @@ namespace ProjektIO2
 
         static Osobnik TabuSearch(int[,] data, int rowsize, int colsize, Random rnd, int powtorzenia)
         {
+            string odp;
+            int wielkosc = 0;
+
+            Console.WriteLine("Podaj wielkość listy Tabu (całkowita, mniejsza od {0})",(rowsize-1));
+            odp = Console.ReadLine();
+            Int32.TryParse(odp, out wielkosc);
+
             int pomocnik = 0;
             int j = 0;
             Tabu t = new Tabu();
@@ -931,7 +1092,7 @@ namespace ProjektIO2
                         if (iterator == 3)
                         {//Zapisanie najlepszego dozwolonego wyniku na listę Tabu
                             result = t;
-                            result.Licznik = 4;
+                            result.Licznik = wielkosc+1;
                             lista.Enqueue(result);
                             outcome = true;
                         }
@@ -942,7 +1103,7 @@ namespace ProjektIO2
                 {//Zapisanie najlepszego wyniku na listę Tabu
                     result.A = t.A;
                     result.B = t.B;
-                    result.Licznik = 4;
+                    result.Licznik = wielkosc+1;
                     Console.WriteLine(t);
                     lista.Enqueue(result);
                     outcome = true;
@@ -997,5 +1158,7 @@ namespace ProjektIO2
 
             return result;
         }
+
+
     }
 }

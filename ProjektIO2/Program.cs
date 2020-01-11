@@ -586,7 +586,7 @@ namespace ProjektIO2
                 //Console.WriteLine(osobnicy[j].Tab[0] + " " + osobnicy[j].suma);
             }
             
-            double rozmiarWycinka = 100 / nrozwiazan;//wielkość pojedynczeko wycinka ruletki
+            double rozmiarWycinka = 100 / nrozwiazan;//wielkość pojedynczego wycinka ruletki413
             double losowa = 0.0;
             int znacznik;
             int mnoznik;
@@ -849,9 +849,11 @@ namespace ProjektIO2
             List<Tabu> top = new List<Tabu>();
             List<Osobnik> kolejnosc = new List<Osobnik>();
             Osobnik Opomocnik = new Osobnik();
-            dane = Losowanie(data, rowsize, colsize, rnd);//Losowanie rozwiązania początkowego i obliczanie czasu zakończenia ostatniego zadania
-            for (int i = 0; i < rowsize; i++)
-                dane.Tab[i] = data[i, 0];
+            //Losowanie rozwiązania początkowego i obliczanie czasu zakończenia ostatniego zadania
+
+            dane = Losowanie(data, rowsize, colsize, rnd);//Żeby wyłączyć losowanie to to komentujesz, a te dwie linijki niżej odkomentowujesz i Ci pójdzie z ustawieniem początkowym 1,2,3...n
+            //for (int i = 0; i < rowsize; i++)
+              // dane.Tab[i] = data[i, 0];
             dane = Zlicz(dane.Tab, data, rowsize, colsize);
             top = new List<Tabu>();
             //Część główna
@@ -985,6 +987,7 @@ namespace ProjektIO2
                     if (result.suma > pomocnik.suma)//Jeżeli najlepszy dotychczasowy wynik jest większy od obecnie badanego ustawienia to następuje aktualizacja nalepszego ustawienia
                         result = pomocnik;
 
+                    Console.WriteLine(h + " " + i + " Pomocnik: " +pomocnik.suma+" Result: "+result.suma);
                     Console.WriteLine(h + " " + i + " Pomocnik: " +pomocnik.suma+" Result: "+result.suma);
                     
                 }

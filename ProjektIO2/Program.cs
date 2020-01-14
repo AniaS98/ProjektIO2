@@ -151,6 +151,7 @@ namespace ProjektIO2
             Console.WriteLine("7.Algorytm Neh");
             rodzaj = Console.ReadLine();
 
+
             if (Int32.Parse(rodzaj) !=5 && Int32.Parse(rodzaj) !=7) 
             {
                 Console.WriteLine("Podaj liczbę pokoleń/powtórzeń:");
